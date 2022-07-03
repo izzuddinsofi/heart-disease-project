@@ -98,4 +98,4 @@ print(f"Test accuracy = {test_result[1]}")
 #%%
 from numba import cuda 
 device = cuda.get_current_device()
-device.reset()
+device.reset() 
