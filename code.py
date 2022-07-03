@@ -1,0 +1,101 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Saturday Jul 02 00:33:07 2022
+
+@author: izzuddinsofi
+
+Heart Disease Project
+"""
+#1. Import the packages
+from sklearn import preprocessing
+import tensorflow as tf
+from tensorflow import keras
+from keras import layers, optimizers, losses, metrics
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from keras.callbacks import EarlyStopping, TensorBoard
+import datetime, os
+import pandas as pd
+
+#2. Import and read dataset using pd.read_csv
+data_path = r"C:\Users\izzuddinsofi\Documents\tensorflow\data\heart.csv"
+df = pd.read_csv(data_path)
+
+#%%
+# print head of the dataframe
+df.head
+
+#Inspect for any NA value
+print(df.isna().sum())
+
+#%%
+#3. Data preprocessing
+# Split data into features and labels
+features = df.copy()
+labels = features.pop('target')
+
+#%%
+#One-hot encode for all the categorical features
+features = pd.get_dummies(features)
+
+#%%
+#Convert dataframe into numpy array
+features = np.array(features)
+labels = np.array(labels)
+
+#%%
+#Perform train-test split
+SEED=0
+x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.3, random_state=SEED)
+
+#Data normalization
+scaler = StandardScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+
+#%%
+#4. Build a NN that overfits easily
+nIn = x_test.shape[-1]
+nClass = len(np.unique(y_test))
+
+model = keras.Sequential()
+model.add(layers.InputLayer(input_shape=(nIn,)))
+model.add(layers.Dense(4096, activation='relu'))
+model.add(layers.Dense(4096, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(nClass, activation='softmax'))
+
+#5. View your model
+model.summary()
+
+#Use in iPython console 
+tf.keras.utils.plot_model(model, show_shapes=True)
+
+#%%
+#6. Compile model
+BATCH_SIZE = 128
+model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+#7. Define callback functions
+base_log_path = r"C:\Users\izzuddinsofi\Documents\tensorflow\GitHub\Heart-Disease-Project\tb_logs"
+log_path= os.path.join(base_log_path, datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + '__Heart_Disease_Dataset')
+es = EarlyStopping(monitor='val_loss', patience=15)
+tb = TensorBoard(log_dir=log_path)
+
+#Train model
+history = model.fit(x_train,y_train, validation_data=(x_test, y_test), batch_size=BATCH_SIZE, epochs=1000, callbacks=[es,tb])
+
+#%%
+#Evaluate with test data for wild testing
+test_result = model.evaluate(x_test,y_test,batch_size=BATCH_SIZE)
+print(f"Test loss = {test_result[0]}")
+print(f"Test accuracy = {test_result[1]}")
+#%%
+from numba import cuda 
+device = cuda.get_current_device()
+device.reset()
