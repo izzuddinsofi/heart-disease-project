@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Saturday Jul 02 00:33:07 2022
+Created on Sat Jul 02 00:33:07 2022
 
 @author: izzuddinsofi
 
