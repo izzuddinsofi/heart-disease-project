@@ -1,4 +1,4 @@
-# Heart Disease Prediction Prediction using FNN
+# Heart Disease Prediction using FNN
 
 ## 1. Summary
 The aim of this project is to create an accurate deep learning model to predict heart disease (risk level of heart disease). The model is trained with dataset from [Heart Disease Dataset](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset)
